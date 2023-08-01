@@ -1,5 +1,5 @@
 # Non-Hermitian-Monte-Carlo-Solver
-monte carlo quantum jump solver for Lindblad equation written in cpp 
+monte carlo quantum jump solver for Lindblad equation written in cpp powered by armadillo 
 
 offers a python api powered by cython to work with qutip 
 
