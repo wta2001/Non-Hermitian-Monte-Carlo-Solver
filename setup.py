@@ -7,9 +7,9 @@ ext_modules = [
         "nhsolver",
         sources=["MCsolver.cc","nhsolver.pyx"],
         language="c++",
-        extra_compile_args=["-std=c++11"],
+        extra_compile_args=["-std=c++11", "-fopenmp"],
         include_dirs=[numpy.get_include()],
-        extra_link_args=["-larmadillo"],
+        extra_link_args=["-larmadillo", "-fopenmp"],
     )
 ]
 

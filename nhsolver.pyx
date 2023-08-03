@@ -24,7 +24,12 @@ cdef class nhsolve:
     def __cinit__(self, H, psi0, tlist, c_ops, e_ops, ntraj=500, num_threads=8):
         cdef cnp.ndarray[cnp.complex128_t, ndim=2] H_in = H.full('F')
         cdef cnp.ndarray[cnp.complex128_t, ndim=2] psi0_in = psi0.full()
+        cdef int q_dim = psi0_in.size
         cdef cnp.ndarray[cnp.float64_t, ndim=1] tlist_in = tlist
+        if not c_ops:
+            c_ops = [qutip.qzero(q_dim)]
+        if not e_ops:
+            e_ops = [qutip.qzero(q_dim)]
         cdef cnp.ndarray[cnp.complex128_t, ndim=1] c_ops_in = np.concatenate([np.ravel(oper.full('F'), order='F') for oper in c_ops])
         cdef cnp.ndarray[cnp.complex128_t, ndim=1] e_ops_in = np.concatenate([np.ravel(oper.full('F'), order='F') for oper in e_ops])
         cdef int ntraj_in = ntraj
@@ -34,7 +39,6 @@ cdef class nhsolve:
         cdef double* tlist_data = <double*> tlist_in.data
         cdef complex[double]* c_ops_data = <complex[double]*> c_ops_in.data
         cdef complex[double]* e_ops_data = <complex[double]*> e_ops_in.data
-        cdef int q_dim = psi0_in.size
         cdef int n_time = tlist.size
         cdef int n_c_ops = len(c_ops)
         cdef int n_e_ops = len(e_ops)
