@@ -44,20 +44,22 @@ Ket MCsolver::Propagate(Ket psi, double dt) {
     }
 }
 
-void MCsolver::Expect_add(Ket psi, arma::uword n_time) {
-    for(arma::uword i = 0; i < e_ops.n_slices; ++i)
-        expect(n_time, i) += arma::cdot(psi, e_ops.slice(i)*psi);
-}
-
 void MCsolver::Solve() {
-    Expect_add(ensemble.col(0), 0);
+    for(arma::uword k = 0; k < e_ops.n_slices; ++k) 
+        expect(0, k) += arma::cdot(ensemble.col(0), e_ops.slice(k)*ensemble.col(0));
     expect *= ensemble.n_cols;
     arma::vec dt = arma::diff(tlist);
     for(arma::uword i = 1; i < tlist.n_elem; ++i) {
         #pragma omp parallel for
         for(arma::uword j = 0; j < ensemble.n_cols; ++j) {
             ensemble.unsafe_col(j) = Propagate(ensemble.col(j), dt(i-1));
-            Expect_add(ensemble.col(j), i);
+            for(arma::uword k = 0; k < e_ops.n_slices; ++k) {
+                complex to_add = arma::cdot(ensemble.col(j), e_ops.slice(k)*ensemble.col(j));
+                #pragma omp critical
+                {
+                expect(i, k) += to_add;
+                }
+            }
         }
     }
     expect /= ensemble.n_cols;

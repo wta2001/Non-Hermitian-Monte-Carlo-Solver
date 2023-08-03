@@ -23,7 +23,6 @@ private:
     arma::cx_cube e_ops;
 
     Ket Propagate(Ket psi, double dt);
-    void Expect_add(Ket psi, arma::uword n_time);
 public:
     arma::cx_mat ensemble;
     arma::cx_mat expect;
