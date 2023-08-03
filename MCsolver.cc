@@ -2,15 +2,16 @@
 
 namespace solver {
 MCsolver::MCsolver(Oper& H_in, Ket& psi0_in, arma::vec& tlist_in, arma::cx_cube& c_ops_in, arma::cx_cube& e_ops_in,
- int& ntraj) :I(0,1), gen(rd()), Heff(H_in), tlist(tlist_in), c_ops(c_ops_in), e_ops(e_ops_in) {
+ int& ntraj, int& num_threads) :I(0,1), gen(rd()), Heff(H_in), tlist(tlist_in), c_ops(c_ops_in), e_ops(e_ops_in) {
     for(arma::uword i = 0; i < c_ops.n_slices; ++i)
         Heff -= I/2.0*c_ops.slice(i).t()*c_ops.slice(i);
     ensemble = arma::repmat(psi0_in, 1, ntraj);
     expect = arma::zeros<arma::cx_mat>(tlist.n_elem, e_ops.n_slices);
+    omp_set_num_threads(num_threads);
 }
 
 MCsolver::MCsolver(complex* H_data, complex* psi0_data, double* tlist_data, complex* c_ops_data, complex* e_ops_data,
- int& q_dim, int& n_time, int& n_c_ops, int& n_e_ops, int& ntraj) :I(0,1), gen(rd()),
+ int& q_dim, int& n_time, int& n_c_ops, int& n_e_ops, int& ntraj, int& num_threads) :I(0,1), gen(rd()),
  Heff(H_data, q_dim, q_dim, false, true), 
  tlist(tlist_data, n_time, false, true),
  c_ops(c_ops_data, q_dim, q_dim, n_c_ops, false, true),
@@ -20,6 +21,7 @@ MCsolver::MCsolver(complex* H_data, complex* psi0_data, double* tlist_data, comp
     Ket psi0(psi0_data, q_dim, false, true);
     ensemble = arma::repmat(psi0, 1, ntraj);
     expect = arma::zeros<arma::cx_mat>(tlist.n_elem, e_ops.n_slices);
+    omp_set_num_threads(num_threads);
 }
 
 Ket MCsolver::Propagate(Ket psi, double dt) {
@@ -52,6 +54,7 @@ void MCsolver::Solve() {
     expect *= ensemble.n_cols;
     arma::vec dt = arma::diff(tlist);
     for(arma::uword i = 1; i < tlist.n_elem; ++i) {
+        #pragma omp parallel for
         for(arma::uword j = 0; j < ensemble.n_cols; ++j) {
             ensemble.unsafe_col(j) = Propagate(ensemble.col(j), dt(i-1));
             Expect_add(ensemble.col(j), i);
