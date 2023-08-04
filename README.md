@@ -3,7 +3,7 @@ monte carlo quantum jump solver for Lindblad equation written in cpp powered by 
 
 offers a python api powered by cython to work with qutip along with c++ api to work with armadillo 
 
-with no normalization of state vector or density matrix so is valid for non-hermitian system 
+will normalize state vector by step, valid for non-hermitian system and gives the expectation according to $expect(A)=tr(\rho A)/tr(\rho)$
 
 much faster than mcsolver in qutip 
 
