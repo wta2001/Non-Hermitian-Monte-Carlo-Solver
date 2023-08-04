@@ -27,18 +27,19 @@ MCsolver::MCsolver(complex* H_data, complex* psi0_data, double* tlist_data, comp
 Ket MCsolver::Propagate(Ket psi, double dt) {
     arma::uword n = c_ops.n_slices;
     arma::vec weights(n+1);
-    arma::cx_vec product;
-    weights.at(n) = 1/dt;
+    Ket product = psi - I*dt*Heff*psi;
+    double result_n = std::real(arma::cdot(product, product));
+    weights.at(n) = result_n/dt;
+    double result;
     for (arma::uword i = 0; i < n; ++i) {
         product = c_ops.slice(i) * psi;
-        double result = std::real(arma::cdot(product, product));
+        result = std::real(arma::cdot(product, product));
         weights.at(i) = result;
-        weights.at(n) -= result;
     }
     std::discrete_distribution<> dist(weights.begin(), weights.end());
     arma::uword idx = dist(gen);
     if(idx == n) {
-        return (psi - I*dt*Heff*psi)/std::sqrt(dt*weights.at(n));
+        return (psi - I*dt*Heff*psi)/std::sqrt(result_n);
     } else {
         return c_ops.slice(idx)*psi/std::sqrt(weights.at(idx));
     }
