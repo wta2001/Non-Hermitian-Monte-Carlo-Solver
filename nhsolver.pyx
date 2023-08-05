@@ -8,7 +8,7 @@ from libcpp.complex cimport complex
 from libcpp.vector cimport vector
 
 
-cdef extern from "MCsolver.hh" namespace "solver":
+cdef extern from "include/MCsolver.hh" namespace "solver":
     cdef cppclass MCsolver:
         MCsolver(complex[double]* H_data, complex[double]* psi0_data, double* tlist_data, complex[double]* c_ops_data, complex[double]* e_ops_data, int& q_dim, int& n_time, int& n_c_ops, int& n_e_ops, int& ntraj, int& num_threads) except +
         void Solve() except +
