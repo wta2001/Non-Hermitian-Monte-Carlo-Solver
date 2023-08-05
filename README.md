@@ -7,4 +7,4 @@ will normalize state vector by step, valid for non-hermitian system and gives th
 
 much faster than mcsolver in qutip 
 
-work parallelly on all cpu cores with openMP 
+work parallelly on all cpus cores with openMP 
