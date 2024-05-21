@@ -1,4 +1,4 @@
-# Non-Hermitian-Monte-Carlo-Solver
+# Monte-Carlo-Solver
 monte carlo solver for Lindblad equation written in cpp powered by armadillo 
 
 offers a python api powered by cython to work with qutip along with c++ api to work with armadillo 
